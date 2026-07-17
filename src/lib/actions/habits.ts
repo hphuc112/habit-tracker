@@ -13,6 +13,9 @@ export async function createHabit(formData: FormData) {
 
   const name = formData.get('name') as string;
   const color = formData.get('color') as string;
+  const frequencyType = (formData.get('frequency_type') as string) || 'daily';
+  const targetCount = Number(formData.get('target_count')) || 1;
+  const graceDays = Number(formData.get('grace_days')) || 0;
 
   if (!name?.trim()) return;
 
@@ -20,6 +23,9 @@ export async function createHabit(formData: FormData) {
     user_id: user.id,
     name: name.trim(),
     color: color || '#6366f1',
+    frequency_type: frequencyType,
+    target_count: targetCount,
+    grace_days: graceDays,
   });
 
   if (error) throw new Error(error.message);

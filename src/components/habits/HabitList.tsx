@@ -8,8 +8,17 @@ type Habit = {
   name: string;
   color: string;
   created_at: string;
+  frequency_type: 'daily' | 'weekly' | 'custom';
+  target_count: number;
+  grace_days: number;
   habit_logs: { date: string }[];
 };
+
+function frequencyLabel(habit: Habit) {
+  if (habit.frequency_type === 'daily') return 'Daily';
+  if (habit.frequency_type === 'weekly') return `${habit.target_count}x / week`;
+  return `${habit.target_count}x / 7 days`;
+}
 
 export function HabitList({ habits }: { habits: Habit[] }) {
   const today = todayISO();
@@ -28,7 +37,7 @@ export function HabitList({ habits }: { habits: Habit[] }) {
         const logDates = habit.habit_logs.map((log) => log.date);
         const { current, longest, completionRate } = calculateStreaks(
           logDates,
-          habit.created_at,
+          habit,
         );
         const doneToday = logDates.includes(today);
 
@@ -41,6 +50,9 @@ export function HabitList({ habits }: { habits: Habit[] }) {
                   style={{ backgroundColor: habit.color }}
                 />
                 {habit.name}
+                <span className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-500 dark:bg-gray-800">
+                  {frequencyLabel(habit)}
+                </span>
               </span>
               <button
                 onClick={() => toggleHabitLog(habit.id, today)}
@@ -50,7 +62,10 @@ export function HabitList({ habits }: { habits: Habit[] }) {
               </button>
             </div>
             <div className="mt-2 flex gap-4 text-xs text-gray-500">
-              <span>{current} day streak</span>
+              <span>
+                {current} {habit.frequency_type === 'daily' ? 'day' : 'period'}{' '}
+                streak
+              </span>
               <span>Best: {longest}</span>
               <span>{Math.round(completionRate * 100)}% completion</span>
             </div>
