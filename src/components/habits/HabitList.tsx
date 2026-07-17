@@ -1,17 +1,15 @@
 'use client';
 
 import { toggleHabitLog } from '@/lib/actions/habits';
+import { calculateStreaks, todayISO } from '@/lib/streaks';
 
 type Habit = {
   id: string;
   name: string;
   color: string;
+  created_at: string;
   habit_logs: { date: string }[];
 };
-
-function todayISO() {
-  return new Date().toISOString().split('T')[0];
-}
 
 export function HabitList({ habits }: { habits: Habit[] }) {
   const today = todayISO();
@@ -27,26 +25,35 @@ export function HabitList({ habits }: { habits: Habit[] }) {
   return (
     <ul className="space-y-3">
       {habits.map((habit) => {
-        const doneToday = habit.habit_logs.some((log) => log.date === today);
+        const logDates = habit.habit_logs.map((log) => log.date);
+        const { current, longest, completionRate } = calculateStreaks(
+          logDates,
+          habit.created_at,
+        );
+        const doneToday = logDates.includes(today);
 
         return (
-          <li
-            key={habit.id}
-            className="flex items-center justify-between rounded border px-4 py-3"
-          >
-            <span className="flex items-center gap-2">
-              <span
-                className="h-3 w-3 rounded-full"
-                style={{ backgroundColor: habit.color }}
-              />
-              {habit.name}
-            </span>
-            <button
-              onClick={() => toggleHabitLog(habit.id, today)}
-              className={`rounded px-3 py-1 text-sm ${doneToday ? 'bg-green-600 text-white' : 'border'}`}
-            >
-              {doneToday ? 'Done ✓' : 'Mark done'}
-            </button>
+          <li key={habit.id} className="rounded border px-4 py-3">
+            <div className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <span
+                  className="h-3 w-3 rounded-full"
+                  style={{ backgroundColor: habit.color }}
+                />
+                {habit.name}
+              </span>
+              <button
+                onClick={() => toggleHabitLog(habit.id, today)}
+                className={`rounded px-3 py-1 text-sm ${doneToday ? 'bg-green-600 text-white' : 'border'}`}
+              >
+                {doneToday ? 'Done ✓' : 'Mark done'}
+              </button>
+            </div>
+            <div className="mt-2 flex gap-4 text-xs text-gray-500">
+              <span>{current} day streak</span>
+              <span>Best: {longest}</span>
+              <span>{Math.round(completionRate * 100)}% completion</span>
+            </div>
           </li>
         );
       })}

@@ -1,34 +1,59 @@
-export type StreakSummary = {
-  currentStreak: number;
-  longestStreak: number;
+import { format, subDays, differenceInCalendarDays, parseISO } from 'date-fns';
+
+export function toLocalISODate(date: Date): string {
+  return format(date, 'yyyy-MM-dd');
+}
+
+export function todayISO(): string {
+  return toLocalISODate(new Date());
+}
+
+export type StreakResult = {
+  current: number;
+  longest: number;
   completionRate: number;
 };
 
-export function calculateStreakSummary(completions: boolean[]): StreakSummary {
-  const completed = completions.filter(Boolean).length;
-  const total = completions.length || 1;
-
-  let currentStreak = 0;
-  for (let i = completions.length - 1; i >= 0; i -= 1) {
-    if (!completions[i]) break;
-    currentStreak += 1;
+export function calculateStreaks(
+  logDates: string[],
+  habitCreatedAt: string,
+): StreakResult {
+  if (logDates.length === 0) {
+    return { current: 0, longest: 0, completionRate: 0 };
   }
 
-  let longestStreak = 0;
-  let running = 0;
+  const dates = Array.from(new Set(logDates)).sort();
+  const dateSet = new Set(dates);
 
-  for (const completedToday of completions) {
-    if (completedToday) {
-      running += 1;
-      longestStreak = Math.max(longestStreak, running);
-    } else {
-      running = 0;
-    }
+  let longest = 1;
+  let run = 1;
+  for (let i = 1; i < dates.length; i++) {
+    const gap = differenceInCalendarDays(
+      parseISO(dates[i]),
+      parseISO(dates[i - 1]),
+    );
+    run = gap === 1 ? run + 1 : 1;
+    longest = Math.max(longest, run);
   }
 
-  return {
-    currentStreak,
-    longestStreak,
-    completionRate: Math.round((completed / total) * 100),
-  };
+  const today = new Date();
+  let cursor = dateSet.has(toLocalISODate(today)) ? today : subDays(today, 1);
+  let current = 0;
+  while (dateSet.has(toLocalISODate(cursor))) {
+    current += 1;
+    cursor = subDays(cursor, 1);
+  }
+
+  // Completion rate: logged days / calendar days since the habit was created
+  const daysSinceCreated =
+    differenceInCalendarDays(
+      new Date(),
+      parseISO(habitCreatedAt.split('T')[0]),
+    ) + 1;
+  const completionRate = Math.min(
+    1,
+    dates.length / Math.max(1, daysSinceCreated),
+  );
+
+  return { current, longest, completionRate };
 }
