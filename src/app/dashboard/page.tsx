@@ -5,6 +5,7 @@ import { HabitList } from '@/components/habits/HabitList';
 import { LogoutButton } from '@/components/layout/LogoutButton';
 import { ContributionHeatmap } from '@/components/heatmap/ContributionHeatmap';
 import { countsByDateFromHabits } from '@/lib/heatmap';
+import Link from 'next/link';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -37,3 +38,12 @@ export default async function DashboardPage() {
     </main>
   );
 }
+<div className="mb-6 flex items-center justify-between">
+  <h1 className="text-2xl font-semibold">Your Habits</h1>
+  <div className="flex items-center gap-4">
+    <Link href="/insights" className="text-sm underline">
+      Insights
+    </Link>
+    <LogoutButton />
+  </div>
+</div>;
