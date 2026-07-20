@@ -2,7 +2,12 @@
 
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
+
+const inputClass =
+  'border-border bg-background text-foreground w-full rounded border px-3 py-2';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,7 +38,10 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto max-w-sm px-4 py-20">
+    <main className="relative mx-auto max-w-sm px-4 py-20">
+      <div className="absolute top-6 right-4">
+        <ThemeToggle />
+      </div>
       <h1 className="mb-6 text-2xl font-semibold">Log in</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
@@ -42,7 +50,7 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full rounded border px-3 py-2"
+          className={inputClass}
         />
         <input
           type="password"
@@ -50,22 +58,27 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full rounded border px-3 py-2"
+          className={inputClass}
         />
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-danger text-sm">{error}</p>}
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+          className="bg-primary text-background hover:bg-primary/90 w-full rounded px-4 py-2 disabled:opacity-50"
         >
           {loading ? 'Logging in...' : 'Log in'}
         </button>
       </form>
-      <p className="mt-4 text-sm text-gray-500">
+      <p className="text-muted mt-4 text-sm">
         No account?{' '}
-        <a href="/signup" className="underline">
+        <Link href="/signup" className="text-foreground underline">
           Sign up
-        </a>
+        </Link>
+      </p>
+      <p className="text-muted mt-2 text-sm">
+        <Link href="/" className="underline">
+          Back to home
+        </Link>
       </p>
     </main>
   );

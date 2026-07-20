@@ -1,26 +1,111 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f9f8f6;
+  --foreground: #2f241d;
+
+  --primary: #2f241d;
+  --secondary: #c9b59c;
+  --muted: #6a5b4f;
+  --accent: #efe9e3;
+  --border: #d9cfc7;
+
+  --success: #4d7c4a;
+  --warning: #b8862c;
+  --danger: #b3452f;
+  --info: #3d6d94;
+
+  --heatmap-0: #e8e2db;
+  --heatmap-1: #c5ddb8;
+  --heatmap-2: #8fbf87;
+  --heatmap-3: #4d7c4a;
+  --heatmap-4: #2f5a2d;
+
+  --chart-primary: #c9b59c;
+  --chart-grid: #d9cfc7;
+  --chart-axis: #6a5b4f;
+}
+
+.dark {
+  --background: #1b1612;
+  --foreground: #f9f8f6;
+
+  --primary: #f9f8f6;
+  --secondary: #c9b59c;
+  --muted: #b8aa9d;
+  --accent: #2f2722;
+  --border: #4a3b30;
+
+  --success: #7fb87a;
+  --warning: #d9a13f;
+  --danger: #d97260;
+  --info: #6ea3c9;
+
+  --heatmap-0: #2f2722;
+  --heatmap-1: #3a4f38;
+  --heatmap-2: #4d7c4a;
+  --heatmap-3: #7fb87a;
+  --heatmap-4: #a8d4a4;
+
+  --chart-primary: #c9b59c;
+  --chart-grid: #4a3b30;
+  --chart-axis: #b8aa9d;
+}
+
+@theme {
+  --color-cream: #f9f8f6;
+  --color-sand: #efe9e3;
+  --color-taupe: #d9cfc7;
+  --color-camel: #c9b59c;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+
+  --color-heatmap-0: var(--heatmap-0);
+  --color-heatmap-1: var(--heatmap-1);
+  --color-heatmap-2: var(--heatmap-2);
+  --color-heatmap-3: var(--heatmap-3);
+  --color-heatmap-4: var(--heatmap-4);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+::selection {
+  background-color: var(--color-camel);
+  color: var(--foreground);
 }

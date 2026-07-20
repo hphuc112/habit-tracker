@@ -4,11 +4,11 @@ import { format, parseISO } from 'date-fns';
 import { buildHeatmapGrid, intensityLevel } from '@/lib/heatmap';
 
 const LEVEL_CLASSES: Record<number, string> = {
-  0: 'bg-gray-100 dark:bg-gray-800',
-  1: 'bg-green-200 dark:bg-green-950',
-  2: 'bg-green-400 dark:bg-green-800',
-  3: 'bg-green-600 dark:bg-green-600',
-  4: 'bg-green-800 dark:bg-green-400',
+  0: 'bg-heatmap-0',
+  1: 'bg-heatmap-1',
+  2: 'bg-heatmap-2',
+  3: 'bg-heatmap-3',
+  4: 'bg-heatmap-4',
 };
 
 export function ContributionHeatmap({
@@ -33,9 +33,9 @@ export function ContributionHeatmap({
   const dayLabels = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 
   return (
-    <div className="overflow-x-auto pb-2">
+    <div className="touch-pan-x overflow-x-auto overscroll-x-contain pb-2">
       <div className="inline-flex gap-2">
-        <div className="flex flex-col gap-[3px] pt-5 text-xs text-gray-400">
+        <div className="text-muted flex flex-col gap-[3px] pt-5 text-xs">
           {dayLabels.map((label, i) => (
             <div key={i} className="h-[11px] leading-[11px]">
               {label}
@@ -44,7 +44,7 @@ export function ContributionHeatmap({
         </div>
         <div className="flex flex-col">
           <div
-            className="mb-1 flex text-xs text-gray-400"
+            className="text-muted mb-1 flex text-xs"
             style={{ gap: '3px' }}
           >
             {monthLabels.map((label, i) => (

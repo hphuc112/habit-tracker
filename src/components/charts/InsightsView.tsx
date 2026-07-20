@@ -25,6 +25,14 @@ type Habit = {
   habit_logs: { date: string }[];
 };
 
+const chartColors = {
+  primary: 'var(--chart-primary)',
+  grid: 'var(--chart-grid)',
+  axis: 'var(--chart-axis)',
+};
+
+const axisTick = { fontSize: 12, fill: chartColors.axis };
+
 export function InsightsView({
   habits,
   earliestDate,
@@ -57,11 +65,11 @@ export function InsightsView({
     <div className="space-y-10">
       <section>
         <h2 className="mb-3 text-lg font-medium">Best day of the week</h2>
-        <p className="mb-3 text-sm text-gray-500">
+        <p className="text-muted mb-3 text-sm">
           {bestDay ? (
             <>
               You complete the most habits on{' '}
-              <span className="font-semibold">{bestDay}s</span>.
+              <span className="text-foreground font-semibold">{bestDay}s</span>.
             </>
           ) : (
             'Not enough data yet.'
@@ -69,9 +77,13 @@ export function InsightsView({
         </p>
         <ResponsiveContainer width="100%" height={200}>
           <BarChart data={weekdayStats}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="day" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+            <CartesianGrid
+              stroke={chartColors.grid}
+              strokeDasharray="3 3"
+              vertical={false}
+            />
+            <XAxis dataKey="day" tick={axisTick} />
+            <YAxis tick={axisTick} allowDecimals={false} width={32} />
             <Tooltip
               formatter={(value) =>
                 typeof value === 'number' ? value.toFixed(2) : value
@@ -80,7 +92,7 @@ export function InsightsView({
             <Bar
               dataKey="avgCompletions"
               radius={[4, 4, 0, 0]}
-              fill="#6366f1"
+              fill={chartColors.primary}
             />
           </BarChart>
         </ResponsiveContainer>
@@ -89,7 +101,7 @@ export function InsightsView({
       <section>
         <h2 className="mb-3 text-lg font-medium">Habit correlations</h2>
         {correlations.length === 0 ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-muted text-sm">
             Need at least two habits with some overlapping history to compare.
           </p>
         ) : (
@@ -97,15 +109,15 @@ export function InsightsView({
             {correlations.slice(0, 5).map((c) => (
               <li
                 key={`${c.habitAName}-${c.habitBName}`}
-                className="flex items-center justify-between rounded border px-4 py-2 text-sm"
+                className="border-border flex flex-wrap items-center justify-between gap-2 rounded border px-4 py-2 text-sm"
               >
-                <span>
-                  {c.habitAName} <span className="text-gray-400">+</span>{' '}
-                  {c.habitBName}
+                <span className="min-w-0">
+                  {c.habitAName}{' '}
+                  <span className="text-muted">+</span> {c.habitBName}
                 </span>
-                <span className="text-gray-500">
+                <span className="text-muted shrink-0">
                   {Math.round(c.score * 100)}% co-occurrence
-                  <span className="ml-2 text-xs text-gray-400">
+                  <span className="text-muted/70 ml-2 text-xs">
                     (n={c.sampleSize})
                   </span>
                 </span>
@@ -119,14 +131,22 @@ export function InsightsView({
         <h2 className="mb-3 text-lg font-medium">12-week trend</h2>
         <ResponsiveContainer width="100%" height={220}>
           <LineChart data={trend}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="weekLabel" tick={{ fontSize: 11 }} interval={1} />
-            <YAxis tick={{ fontSize: 12 }} allowDecimals={false} />
+            <CartesianGrid
+              stroke={chartColors.grid}
+              strokeDasharray="3 3"
+              vertical={false}
+            />
+            <XAxis
+              dataKey="weekLabel"
+              tick={{ fontSize: 11, fill: chartColors.axis }}
+              interval="preserveStartEnd"
+            />
+            <YAxis tick={axisTick} allowDecimals={false} width={32} />
             <Tooltip />
             <Line
               type="monotone"
               dataKey="completions"
-              stroke="#6366f1"
+              stroke={chartColors.primary}
               strokeWidth={2}
               dot={false}
             />

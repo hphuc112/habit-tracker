@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { InsightsView } from '@/components/charts/InsightsView';
+import { AppShell } from '@/components/layout/AppShell';
+import { FetchError } from '@/components/layout/FetchError';
 
 export default async function InsightsPage() {
   const supabase = await createClient();
@@ -10,29 +12,35 @@ export default async function InsightsPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: habits } = await supabase
+  const { data: habits, error } = await supabase
     .from('habits')
     .select('id, name, created_at, habit_logs(date)')
     .eq('user_id', user.id)
     .is('archived_at', null)
     .order('created_at', { ascending: true });
 
+  if (error) {
+    return (
+      <AppShell title="Insights">
+        <FetchError message="We couldn't load insights. Check your connection and try again." />
+      </AppShell>
+    );
+  }
+
   if (!habits || habits.length === 0) {
     return (
-      <main className="mx-auto max-w-3xl px-4 py-10">
-        <h1 className="mb-4 text-2xl font-semibold">Insights</h1>
-        <p className="text-sm text-gray-500">
+      <AppShell title="Insights">
+        <p className="text-muted text-sm">
           Add a few habits and log some completions first — insights need data
           to work with.
         </p>
-      </main>
+      </AppShell>
     );
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="mb-6 text-2xl font-semibold">Insights</h1>
+    <AppShell title="Insights">
       <InsightsView habits={habits} earliestDate={habits[0].created_at} />
-    </main>
+    </AppShell>
   );
 }
