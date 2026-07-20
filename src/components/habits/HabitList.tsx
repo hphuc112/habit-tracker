@@ -1,7 +1,13 @@
 'use client';
 
-import { toggleHabitLog } from '@/lib/actions/habits';
+import { useState } from 'react';
+import {
+  archiveHabit,
+  deleteHabit,
+  toggleHabitLog,
+} from '@/lib/actions/habits';
 import { calculateStreaks, todayISO } from '@/lib/streaks';
+import { HabitEditForm } from '@/components/habits/HabitEditForm';
 
 type Habit = {
   id: string;
@@ -22,6 +28,7 @@ function frequencyLabel(habit: Habit) {
 
 export function HabitList({ habits }: { habits: Habit[] }) {
   const today = todayISO();
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   if (habits.length === 0) {
     return (
@@ -40,6 +47,7 @@ export function HabitList({ habits }: { habits: Habit[] }) {
           habit,
         );
         const doneToday = logDates.includes(today);
+        const isEditing = editingId === habit.id;
 
         return (
           <li
@@ -57,25 +65,79 @@ export function HabitList({ habits }: { habits: Habit[] }) {
                   {frequencyLabel(habit)}
                 </span>
               </span>
-              <button
-                onClick={() => toggleHabitLog(habit.id, today)}
-                className={`shrink-0 rounded px-3 py-1 text-sm transition ${
-                  doneToday
-                    ? 'bg-success text-background'
-                    : 'border-border hover:bg-accent border'
-                }`}
-              >
-                {doneToday ? 'Done ✓' : 'Mark done'}
-              </button>
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                <button
+                  onClick={() => toggleHabitLog(habit.id, today)}
+                  className={`rounded px-3 py-1 text-sm transition ${
+                    doneToday
+                      ? 'bg-success text-background'
+                      : 'border-border hover:bg-accent border'
+                  }`}
+                >
+                  {doneToday ? 'Done ✓' : 'Mark done'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setEditingId(isEditing ? null : habit.id)
+                  }
+                  className="text-muted hover:text-foreground text-xs underline transition"
+                >
+                  {isEditing ? 'Close' : 'Edit'}
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (
+                      !window.confirm(
+                        `Archive "${habit.name}"? You can add a new habit anytime; archived habits are hidden from the dashboard.`,
+                      )
+                    ) {
+                      return;
+                    }
+                    await archiveHabit(habit.id);
+                  }}
+                  className="text-muted hover:text-foreground text-xs underline transition"
+                >
+                  Archive
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (
+                      !window.confirm(
+                        `Permanently delete "${habit.name}" and all its logs? This cannot be undone.`,
+                      )
+                    ) {
+                      return;
+                    }
+                    await deleteHabit(habit.id);
+                  }}
+                  className="text-danger text-xs underline transition hover:opacity-80"
+                >
+                  Delete
+                </button>
+              </div>
             </div>
-            <div className="text-muted mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
-              <span>
-                {current} {habit.frequency_type === 'daily' ? 'day' : 'period'}{' '}
-                streak
-              </span>
-              <span>Best: {longest}</span>
-              <span>{Math.round(completionRate * 100)}% completion</span>
-            </div>
+
+            {!isEditing && (
+              <div className="text-muted mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                <span>
+                  {current}{' '}
+                  {habit.frequency_type === 'daily' ? 'day' : 'period'} streak
+                </span>
+                <span>Best: {longest}</span>
+                <span>{Math.round(completionRate * 100)}% completion</span>
+              </div>
+            )}
+
+            {isEditing && (
+              <HabitEditForm
+                habit={habit}
+                onCancel={() => setEditingId(null)}
+                onSaved={() => setEditingId(null)}
+              />
+            )}
           </li>
         );
       })}

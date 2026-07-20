@@ -1,7 +1,13 @@
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/server';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <main className="bg-background relative flex min-h-screen flex-col items-center justify-center px-6 py-16">
       <div className="absolute top-6 right-6">
@@ -20,18 +26,29 @@ export default function Home() {
         </p>
 
         <div className="mt-8 flex flex-wrap gap-4">
-          <Link
-            href="/dashboard"
-            className="bg-primary text-background hover:bg-primary/90 rounded-full px-5 py-3 font-medium transition"
-          >
-            Open dashboard
-          </Link>
-          <Link
-            href="/login"
-            className="border-border hover:bg-background rounded-full border px-5 py-3 font-medium transition"
-          >
-            Log in
-          </Link>
+          {user ? (
+            <Link
+              href="/dashboard"
+              className="bg-primary text-background hover:bg-primary/90 rounded-full px-5 py-3 font-medium transition"
+            >
+              Go to dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/signup"
+                className="bg-primary text-background hover:bg-primary/90 rounded-full px-5 py-3 font-medium transition"
+              >
+                Get started free
+              </Link>
+              <Link
+                href="/login"
+                className="border-border hover:bg-background rounded-full border px-5 py-3 font-medium transition"
+              >
+                Log in
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </main>

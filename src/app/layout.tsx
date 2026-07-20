@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 
@@ -11,22 +12,6 @@ const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
 });
-
-const themeScript = `
-  (function () {
-    try {
-      const storedTheme = window.localStorage.getItem("theme");
-      const isDark = storedTheme
-        ? storedTheme === "dark"
-        : window.matchMedia("(prefers-color-scheme: dark)").matches;
-      document.documentElement.classList.toggle("dark", isDark);
-      document.documentElement.style.colorScheme = isDark ? "dark" : "light";
-    } catch (e) {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.style.colorScheme = "light";
-    }
-  })();
-`;
 
 export const metadata: Metadata = {
   title: 'Habit Tracker',
@@ -45,10 +30,24 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
-      <body className="font-sans flex min-h-full flex-col">{children}</body>
+      <body className="font-sans flex min-h-full flex-col">
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`(function () {
+  try {
+    var storedTheme = window.localStorage.getItem("theme");
+    var isDark = storedTheme
+      ? storedTheme === "dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.classList.toggle("dark", isDark);
+    document.documentElement.style.colorScheme = isDark ? "dark" : "light";
+  } catch (e) {
+    document.documentElement.classList.remove("dark");
+    document.documentElement.style.colorScheme = "light";
+  }
+})();`}
+        </Script>
+        {children}
+      </body>
     </html>
   );
 }

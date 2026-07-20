@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Habit Tracker
 
-## Getting Started
+A full-stack habit tracker with flexible scheduling, streak analytics, and a GitHub-style contribution heatmap. Built with Next.js App Router, Supabase, and Tailwind CSS v4.
 
-First, run the development server:
+**Live demo:** [habit-tracker.tranhoangphucttb.dev](https://habit-tracker.tranhoangphucttb.dev/)
+
+## Features
+
+- **Auth** — Email/password sign up and log in via Supabase
+- **Flexible habits** — Daily, weekly (calendar week), or custom rolling 7-day targets with grace days
+- **Streaks** — Current streak, best streak, and completion rate per habit
+- **Contribution heatmap** — Visual overview of recent activity (recent weeks aligned to the right)
+- **Insights** — Best day of the week, habit correlations, and 12-week trend charts
+- **Dark / light mode** — Shared cream/sand design tokens with the portfolio site
+
+## Stack
+
+- [Next.js 16](https://nextjs.org/) (App Router, Server Components, Server Actions)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS v4](https://tailwindcss.com/) — CSS-first `@theme` tokens
+- [Supabase](https://supabase.com/) — Postgres, auth, Row Level Security
+- [Recharts](https://recharts.org/) — Insights charts
+- [date-fns](https://date-fns.org/) — Date utilities
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 20+
+- A [Supabase](https://supabase.com/) project with `habits` and `habit_logs` tables (RLS enabled)
+
+### Environment variables
+
+Copy `.env.example` to `.env.local` and fill in your Supabase credentials:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-project-url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-anon-key
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Run locally
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+### Build
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run build
+npm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project structure
 
-## Deploy on Vercel
+```
+src/
+├── app/                  # Routes (dashboard, insights, auth)
+├── components/
+│   ├── charts/           # Insights charts
+│   ├── habits/           # Habit form, list, edit
+│   ├── heatmap/          # Contribution heatmap
+│   └── layout/           # App shell, theme toggle
+└── lib/
+    ├── actions/          # Server actions (CRUD, logging)
+    ├── insights.ts       # Analytics helpers
+    ├── streaks.ts        # Streak calculation
+    └── supabase/         # Supabase clients
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deploy to [Vercel](https://vercel.com). Set the same environment variables in your project settings and add your production URL to Supabase auth redirect allowlist.
+
+## License
+
+Private portfolio project.

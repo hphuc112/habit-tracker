@@ -2,34 +2,31 @@
 
 import { useEffect, useState } from 'react';
 
-function getInitialTheme(): 'dark' | 'light' {
-  if (typeof window === 'undefined') return 'light';
-
-  const storedTheme = window.localStorage.getItem('theme');
-  if (storedTheme === 'dark' || storedTheme === 'light') {
-    return storedTheme;
-  }
-
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light';
-}
-
 function applyTheme(nextTheme: 'dark' | 'light') {
   document.documentElement.classList.toggle('dark', nextTheme === 'dark');
   document.documentElement.style.colorScheme = nextTheme;
   window.localStorage.setItem('theme', nextTheme);
 }
 
+function readThemeFromDocument(): 'dark' | 'light' {
+  return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+}
+
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<'dark' | 'light'>(getInitialTheme);
+  const [theme, setTheme] = useState<'dark' | 'light'>('light');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    applyTheme(theme);
-  }, [theme]);
+    setTheme(readThemeFromDocument());
+    setMounted(true);
+  }, []);
 
   const toggleTheme = () => {
-    setTheme((current) => (current === 'dark' ? 'light' : 'dark'));
+    setTheme((current) => {
+      const nextTheme = current === 'dark' ? 'light' : 'dark';
+      applyTheme(nextTheme);
+      return nextTheme;
+    });
   };
 
   return (
@@ -37,9 +34,15 @@ export function ThemeToggle() {
       type="button"
       onClick={toggleTheme}
       className="border-border bg-accent hover:bg-secondary/30 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border transition"
-      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+      aria-label={
+        mounted
+          ? `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`
+          : 'Toggle color mode'
+      }
     >
-      {theme === 'dark' ? (
+      {!mounted ? (
+        <span className="h-4 w-4" aria-hidden />
+      ) : theme === 'dark' ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
